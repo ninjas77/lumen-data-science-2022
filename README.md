@@ -1,7 +1,7 @@
 Lumen Data Science 2022
 ==============================
 Tim: Pet Matematičara
-==============================
+------------
 
 
 A short description of the project.
