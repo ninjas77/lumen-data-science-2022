@@ -29,29 +29,37 @@ class baseModel(LightningModule):
         self.model = create_model(model_name, model_hparams)
         self.loss = nn.CrossEntropyLoss()
 
-        def configure_optimizers(self):
-            if self.hparams.optimizer_name == "Adam":
-                optimizer = torch.optim.Adam(self.parameters(), **self.hparams.optimizer_hparams)
-            elif self.hparams.optimizer_name == "SGD":
-                optimizer = torch.optim.SGD(self.parameters(), **self.hparams.optimizer_hparams)
-            else:
-                assert False, f'Unknown optimizer: "{self.hparams.optimizer_name}"'
+    def forward(self, x):
+        x = self.model(x)
+        return x
 
-            return optimizer
+    def training_step(self, batch, batch_idx):
+        images, labels = batch
+        predictions = self.model(images)
+        loss = self.loss(predictions, labels)
+        # logs losses for tensorboard/MLFlow/weights and biases
+        self.log("training_loss", loss)
 
-        def training_step(self, batch, batch_idx):
-            images, labels = batch
-            predictions = self.model(images)
-            loss = self.loss(predictions, labels)
+        return loss
 
-            # logs losses for tensorboard/MLFlow/weights and biases
-            self.log("training_loss", loss)
+    def validation_step(self, batch, batch_idx):
+        images, labels = batch
+        predictions = self.model(images)
+        loss = self.loss(predictions, labels)
+        self.log("val_loss", loss)
 
-            return loss
+    def test_step(self, batch, batch_idx):
+        images, labels = batch
+        predictions = self.model(images)
+        loss = self.loss(predictions, labels)
+        self.log("test_loss", loss)
 
-        def validation_step(self, batch, batch_idx):
-            images, labels = batch
-            predictions = self.model(images)
-            loss = self.loss(predictions, labels)
+    def configure_optimizers(self):
+        if self.hparams.optimizer_name == "Adam":
+            optimizer = torch.optim.Adam(self.parameters(), **self.hparams.optimizer_hparams)
+        elif self.hparams.optimizer_name == "SGD":
+            optimizer = torch.optim.SGD(self.parameters(), **self.hparams.optimizer_hparams)
+        else:
+            assert False, f'Unknown optimizer: "{self.hparams.optimizer_name}"'
 
-            self.log("val_loss", loss)
+        return optimizer

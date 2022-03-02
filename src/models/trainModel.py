@@ -5,7 +5,7 @@ from baseModel import baseModel
 device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
 
 
-def train_model(model_name, save_name = None, **kwargs):
+def train_model(model_name, save_name=None, **kwargs):
     """
     Inputs:
         model_name - name to be passed to baseModel constructor
@@ -28,3 +28,8 @@ def train_model(model_name, save_name = None, **kwargs):
 
     return model, result
 
+if __name__ == "__main__":
+    train_model(model_name="basicCNN",
+                model_hparams={"num_classes": 4, "act_fn_name": "relu"},
+                optimizer_name="Adam",
+                optimizer_hparams={"lr": 1e-3})
