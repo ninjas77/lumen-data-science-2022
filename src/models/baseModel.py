@@ -14,17 +14,18 @@ def create_model(model_name, model_hparams):
         assert False, f'Unknown model name "{model_name}". Available models are: {str(model_dict.keys())}'
 
 
-class baseModel(LightningModule):
+# noinspection PyAbstractClass,PyUnusedLocal
+class BaseModel(LightningModule):
 
     def __init__(self, model_name, model_hparams, optimizer_name, optimizer_hparams):
         """
         Inputs:
             model_name - name of the model architecture - currently implemented: basicCNN
-            model_hparams - dictionary of model hyperparameters
+            model_hparams - dictionary of model hyperparameters, i.e. activation function
             optimizer_name - name of optimizer - currently implemented: Adam, SGD
-            optimizer_hparams - dictionary of model hyperparameters - i.e. learning rate
+            optimizer_hparams - dictionary of optimizer hyperparameters - i.e. learning rate
         """
-        super(baseModel, self).__init__()
+        super(BaseModel, self).__init__()
         self.save_hyperparameters()
         self.model = create_model(model_name, model_hparams)
         self.loss = nn.CrossEntropyLoss()
@@ -33,25 +34,23 @@ class baseModel(LightningModule):
         x = self.model(x)
         return x
 
-    def training_step(self, batch, batch_idx):
+    def step(self, batch, batch_idx):
         images, labels = batch
         predictions = self.model(images)
         loss = self.loss(predictions, labels)
-        # logs losses for tensorboard/MLFlow/weights and biases
-        self.log("training_loss", loss)
+        return loss
 
+    def training_step(self, batch, batch_idx):
+        loss = self.step(batch, batch_idx)
+        self.log("training_loss", loss)
         return loss
 
     def validation_step(self, batch, batch_idx):
-        images, labels = batch
-        predictions = self.model(images)
-        loss = self.loss(predictions, labels)
+        loss = self.step(batch, batch_idx)
         self.log("val_loss", loss)
 
     def test_step(self, batch, batch_idx):
-        images, labels = batch
-        predictions = self.model(images)
-        loss = self.loss(predictions, labels)
+        loss = self.step(batch, batch_idx)
         self.log("test_loss", loss)
 
     def configure_optimizers(self):

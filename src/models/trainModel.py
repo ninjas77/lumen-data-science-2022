@@ -1,6 +1,6 @@
 import pytorch_lightning as pl
 import torch
-from baseModel import baseModel
+from baseModel import BaseModel
 
 device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
 
@@ -18,7 +18,7 @@ def train_model(model_name, save_name=None, **kwargs):
                          gpus=1 if str(device) == "cuda:0" else 0,
                          max_epochs=100)
 
-    model = baseModel(model_name=model_name, **kwargs)
+    model = BaseModel(model_name=model_name, **kwargs)
 
     # TODO: implement training and validation dataloaders
     trainer.fit(model, train_loader, val_loader)
@@ -28,8 +28,13 @@ def train_model(model_name, save_name=None, **kwargs):
 
     return model, result
 
-if __name__ == "__main__":
+
+def main():
     train_model(model_name="basicCNN",
                 model_hparams={"num_classes": 4, "act_fn_name": "relu"},
                 optimizer_name="Adam",
                 optimizer_hparams={"lr": 1e-3})
+
+
+if __name__ == "__main__":
+    main()
