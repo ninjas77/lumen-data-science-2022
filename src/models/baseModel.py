@@ -47,11 +47,11 @@ class BaseModel(LightningModule):
 
     def validation_step(self, batch, batch_idx):
         loss = self.step(batch, batch_idx)
-        self.log("val_loss", loss)
+        self.log("val_loss", loss, on_step=False, on_epoch=True)
 
     def test_step(self, batch, batch_idx):
         loss = self.step(batch, batch_idx)
-        self.log("test_loss", loss)
+        self.log("test_loss", loss, on_step=False, on_epoch=True)
 
     def configure_optimizers(self):
         if self.hparams.optimizer_name == "Adam":

@@ -2,10 +2,10 @@ from types import SimpleNamespace
 from torch import nn
 
 # contains available activation functions, TODO: move this to config file
-act_fn_by_name = {"tanh": nn.Tanh,
-                  "relu": nn.ReLU,
-                  "leakyrelu": nn.LeakyReLU,
-                  "gelu": nn.GELU}
+activation_function = {"tanh": nn.Tanh,
+                       "relu": nn.ReLU,
+                       "leakyrelu": nn.LeakyReLU,
+                       "gelu": nn.GELU}
 
 
 class ConvLayer(nn.Module):
@@ -54,7 +54,7 @@ class basicCNN(nn.Module):
         self.hparams = SimpleNamespace(
             n_classes=n_classes,
             act_fn_name=act_fn_name,
-            act_fn=act_fn_by_name[act_fn_name]
+            act_fn=activation_function[act_fn_name]
         )
 
         self.network = nn.Sequential(
